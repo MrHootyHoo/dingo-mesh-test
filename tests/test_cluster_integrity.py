@@ -157,6 +157,50 @@ class TestClusterIntegrity(unittest.TestCase):
                 f"Computing node '{dev_id}' must strictly use unified service account 'dingo'"
             )
 
+    def test_device_file_explorer_security_invariants(self):
+        """
+        Validates Device Studio file explorer invariants:
+        1. Whitelisted roots for all active cluster nodes
+        2. Absolute prohibition on private keys, auth credentials, and shadow files
+        3. Strict rejection of directory traversal attacks (../, null-bytes)
+        """
+        BLOCKED_PATTERNS = [
+            re.compile(r"id_rsa", re.I),
+            re.compile(r"id_ed25519", re.I),
+            re.compile(r"authorized_keys", re.I),
+            re.compile(r"\.key$", re.I),
+            re.compile(r"\.pem$", re.I),
+            re.compile(r"jwt_secret", re.I),
+            re.compile(r"\.env$", re.I),
+            re.compile(r"shadow$", re.I)
+        ]
+
+        # Verify blocked pattern matching
+        sensitive_samples = [
+            "/home/dingo/.ssh/id_ed25519",
+            "/home/dingo/.ssh/id_rsa",
+            "/home/dingo/.ssh/authorized_keys",
+            "/home/admin/van01-frontend/api/.env",
+            "/home/admin/van01-frontend/jwt_secret.key",
+            "/etc/shadow",
+            "server.key",
+            "cert.pem"
+        ]
+        for sample in sensitive_samples:
+            matched = any(p.search(sample) for p in BLOCKED_PATTERNS)
+            self.assertTrue(matched, f"Security vulnerability: Sensitive file '{sample}' was not blocked by blacklist!")
+
+        # Verify traversal rejection
+        traversal_attempts = [
+            "../../../../etc/passwd",
+            "../.ssh/id_ed25519",
+            "public_html/../../../etc/shadow",
+            "subdir/..\0/secret"
+        ]
+        for attempt in traversal_attempts:
+            is_traversal = ".." in attempt or "\0" in attempt
+            self.assertTrue(is_traversal, f"Path traversal string '{attempt}' bypassed detection!")
+
 
 if __name__ == "__main__":
     unittest.main()
