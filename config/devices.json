@@ -1,0 +1,130 @@
+[
+  {
+    "id": "van01",
+    "name": "van01",
+    "role": "Primary Edge Gateway & Controller",
+    "type": "Raspberry Pi 5",
+    "ip": "192.168.0.106",
+    "vip": "192.168.0.200",
+    "vpnIp": "192.168.219.16",
+    "user": "admin",
+    "isLocal": true,
+    "status": "online",
+    "circleOfTrust": "Primary Hardware Root of Trust (mTLS Enclave)",
+    "description": "Primary vehicle edge node hosting interface, local daemons, BMS sensors & gateway",
+    "specs": {
+      "arch": "aarch64",
+      "cpuModel": "Broadcom BCM2712 (4x Cortex-A76 @ 2.40GHz)",
+      "cpuCores": 4,
+      "memTotalMB": 8192,
+      "storage": "256GB NVMe SSD + 256GB MicroSD",
+      "os": "Debian GNU/Linux 13 (Trixie) / Kernel 6.18"
+    }
+  },
+  {
+    "id": "van02",
+    "name": "van02",
+    "role": "Secondary Edge Node & Replica Host",
+    "type": "Raspberry Pi 5 Model B",
+    "ip": "192.168.0.105",
+    "vpnIp": "192.168.219.18",
+    "user": "admin",
+    "isLocal": false,
+    "status": "online",
+    "circleOfTrust": "Verified Peer Node (mTLS Enclave)",
+    "description": "Secondary van edge node for redundant database replicas & pipelines",
+    "specs": {
+      "arch": "aarch64",
+      "cpuModel": "Broadcom BCM2712 (4x Cortex-A76 @ 2.40GHz)",
+      "cpuCores": 4,
+      "memTotalMB": 2048,
+      "storage": "256GB MicroSD",
+      "os": "Debian GNU/Linux 13 (Trixie) / Kernel 6.18"
+    }
+  },
+  {
+    "id": "brain01",
+    "name": "brain01",
+    "role": "Neural Compute Core & Workstation",
+    "type": "High-Performance Windows Compute Node",
+    "ip": "192.168.0.108",
+    "vpnIp": "192.168.219.5",
+    "user": "mrhootyhoo",
+    "isLocal": false,
+    "status": "online",
+    "circleOfTrust": "Verified Windows Compute Core (mTLS/SSH Enclave)",
+    "description": "High-performance Windows workstation and compute node for Antigravity IDE, CLI, and model execution",
+    "specs": {
+      "arch": "x86_64",
+      "cpuModel": "13th Gen Intel(R) Core(TM) i7-13700K (16C/24T)",
+      "cpuCores": 16,
+      "memTotalMB": 32768,
+      "storage": "1TB Sabrent Rocket 4.0 NVMe + 256GB SK hynix NVMe",
+      "os": "Microsoft Windows 11 Pro"
+    }
+  },
+  {
+    "id": "node01",
+    "name": "node01",
+    "role": "Klipper / Mainsail 3D Fabrication Node",
+    "type": "Raspberry Pi 4 Model B Rev 1.5",
+    "ip": "192.168.0.107",
+    "vpnIp": "192.168.219.20",
+    "user": "dingo",
+    "isLocal": false,
+    "status": "online",
+    "circleOfTrust": "Verified Enclave Member (Fabrication Node / Headless)",
+    "description": "Dedicated 3D Printing & Firmware host running Klipper, Moonraker, and Mainsail at root HTTP. Hosts Antigravity CLI runner with strict non-interference guard during active prints.",
+    "specs": {
+      "arch": "aarch64",
+      "cpuModel": "Broadcom BCM2711, Quad-core Cortex-A72 @ 1.8GHz",
+      "cpuCores": 4,
+      "memTotalMB": 4096,
+      "storage": "128GB SanDisk Ultra UHS-I MicroSD",
+      "os": "Debian GNU/Linux 11 (Bullseye)"
+    }
+  },
+  {
+    "id": "server01",
+    "name": "server01",
+    "role": "Cloud VPN & AI Hub Node",
+    "type": "Google Cloud Compute Engine (e2-standard-2 / us-central1-c)",
+    "ip": "192.168.219.1",
+    "vpnIp": "192.168.219.1",
+    "publicIp": "34.27.247.50",
+    "user": "dingo",
+    "isLocal": false,
+    "status": "online",
+    "circleOfTrust": "Verified Cloud Anchor Node (Pritunl lan0 / SSH Enclave)",
+    "description": "Cloud VPN & AI Hub Node, 24/7 State Daemon, PostgreSQL 16 & Redis Telemetry Core, Pritunl VPN Hub & Antigravity Swarm Node",
+    "specs": {
+      "arch": "x86_64",
+      "cpuModel": "Intel Xeon / AMD EPYC (2 vCPUs)",
+      "cpuCores": 4,
+      "memTotalMB": 4096,
+      "storage": "100GB Persistent SSD",
+      "os": "Debian GNU/Linux 12 (Bookworm)"
+    }
+  },
+  {
+    "id": "omada-gw",
+    "name": "omada-gw",
+    "role": "Hardware Perimeter Gateway & Multi-WAN Router",
+    "type": "TP-Link Omada ER706W Gigabit VPN Gateway (Wi-Fi 6 AX3000)",
+    "ip": "192.168.0.1",
+    "vpnIp": "192.168.219.19",
+    "user": "admin",
+    "isLocal": false,
+    "status": "online",
+    "circleOfTrust": "Hardware Perimeter Gateway & VPN Concentrator",
+    "description": "TP-Link Omada ER706W multi-WAN gateway router interfacing Starlink uplink, LAN boundary, Wi-Fi 6 AX3000, and WireGuard/OpenVPN mesh tunnels",
+    "specs": {
+      "arch": "ARM Cortex-A53",
+      "cpuModel": "MediaTek MT7981 (Dual-Core @ 1.0GHz)",
+      "cpuCores": 2,
+      "memTotalMB": 512,
+      "storage": "128MB SPI NAND Flash",
+      "os": "Omada Standalone Gateway OS (ER706W v1.20 / LuCI)"
+    }
+  }
+]
