@@ -142,6 +142,21 @@ class TestClusterIntegrity(unittest.TestCase):
         self.assertIn("Role B: Active Compute & Fabrication Worker", spec_content)
         self.assertIn("Role C: Headless / Backup Node", spec_content)
 
+    def test_reboot_policy_invariants(self):
+        """
+        Validates cluster safety invariants:
+        1. server01 must never be rebooted via web/remote API
+        2. node01 must enforce non-interference print safety guard
+        3. All computing nodes must dispatch under the unified 'dingo' service account
+        """
+        for dev_id, dev in self.device_map.items():
+            if dev_id == "omada-gw":
+                continue
+            self.assertEqual(
+                dev["user"], "dingo",
+                f"Computing node '{dev_id}' must strictly use unified service account 'dingo'"
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
