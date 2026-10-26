@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # Circle of Trust: Hub Web Terminal Dispatcher (ttyd backend)
-# Dispatches terminal sessions based on URL argument:
-#   ?arg=van01     -> Local Pi 5 Primary Edge Node
-#   ?arg=van02     -> Pi 5 Secondary Edge / Workstation Node (SSH)
-#   ?arg=brain01   -> Windows 11 Neural Workstation Node (SSH)
-#   ?arg=node01    -> Fabrication Node / Klipper Pi 4B (SSH)
-#   ?arg=server01  -> Cloud Anchor / GCP us-central1 (SSH)
-#   ?arg=omada-gw  -> TP-Link Omada ER706W Hardware Gateway (CLI / SSH)
+# Dispatches terminal sessions strictly under the unified 'dingo' service account:
+#   ?arg=van01     -> Local Pi 5 Primary Edge Node (dingo)
+#   ?arg=van02     -> Pi 5 Secondary Edge / Workstation Node (dingo@192.168.0.105)
+#   ?arg=brain01   -> Windows 11 Neural Workstation Node (dingo@192.168.0.108)
+#   ?arg=node01    -> Fabrication Node / Klipper Pi 4B (dingo@192.168.0.107)
+#   ?arg=server01  -> Cloud Anchor / GCP us-central1 (dingo@192.168.219.1)
+#   ?arg=omada-gw  -> TP-Link Omada ER706W Hardware Gateway (gw-cli)
 # ==============================================================================
 set -e
 
@@ -19,45 +19,43 @@ clear
 case "$TARGET" in
   van01)
     if [[ "$LOCAL_HOST" == *"van01"* ]]; then
-      export PS1='\[\033[01;32m\]admin@van01\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
-      cd /home/admin/workspace 2>/dev/null || cd /home/admin
       echo -e "\033[1;36m========================================================================\033[0m"
       echo -e "\033[1;32m ✔ Connected to van01 (Primary Edge Gateway / Active Host Controller)\033[0m"
-      echo -e "\033[2m Host: 192.168.0.106 | Architecture: aarch64 (Raspberry Pi 5) | Circle of Trust\033[0m"
+      echo -e "\033[2m Host: 192.168.0.106 | User: dingo | Circle of Trust\033[0m"
       echo -e "\033[1;36m========================================================================\033[0m\n"
-      exec /bin/bash -i
+      cd /home/dingo 2>/dev/null || cd /home/admin
+      exec sudo -u dingo -i
     else
-      echo -e "\033[1;33mConnecting to van01 (192.168.0.106) via SSH...\033[0m"
-      exec ssh -o StrictHostKeyChecking=no admin@192.168.0.106
+      echo -e "\033[1;33mConnecting to van01 (192.168.0.106) via SSH as dingo...\033[0m"
+      exec ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 dingo@192.168.0.106
     fi
     ;;
 
   van02)
     if [[ "$LOCAL_HOST" == *"van02"* ]]; then
-      export PS1='\[\033[01;33m\]admin@van02\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
-      cd /home/admin/workspace 2>/dev/null || cd /home/admin
       echo -e "\033[1;36m========================================================================\033[0m"
       echo -e "\033[1;33m ✔ Connected to van02 (Secondary Edge Node / Pi 5 Replica Host)\033[0m"
-      echo -e "\033[2m Host: 192.168.0.105 | Architecture: aarch64 (Raspberry Pi 5) | Circle of Trust\033[0m"
+      echo -e "\033[2m Host: 192.168.0.105 | User: dingo | Circle of Trust\033[0m"
       echo -e "\033[1;36m========================================================================\033[0m\n"
-      exec /bin/bash -i
+      cd /home/dingo 2>/dev/null || cd /home/admin
+      exec sudo -u dingo -i
     else
-      echo -e "\033[1;33mConnecting to van02 (192.168.0.105) via SSH...\033[0m"
-      exec ssh -o StrictHostKeyChecking=no admin@192.168.0.105
+      echo -e "\033[1;33mConnecting to van02 (192.168.0.105) via SSH as dingo...\033[0m"
+      exec ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 dingo@192.168.0.105
     fi
     ;;
 
   brain01)
     echo -e "\033[1;36m========================================================================\033[0m"
     echo -e "\033[1;35m 🧠 Connecting to brain01 (Neural Compute Node • Windows 11 / WSL2)\033[0m"
-    echo -e "\033[2m Host: 192.168.0.108 | User: mrhootyhoo | Circle of Trust\033[0m"
+    echo -e "\033[2m Host: 192.168.0.108 | User: dingo | Circle of Trust\033[0m"
     echo -e "\033[1;36m========================================================================\033[0m\n"
     if ! ping -c 1 -W 2 192.168.0.108 >/dev/null 2>&1; then
       echo -e "\033[1;31m[-] Host 192.168.0.108 (brain01) is currently unreachable or sleeping.\033[0m"
       echo -e "\033[2mTip: You can send a Wake-on-LAN magic packet from the dashboard\033[0m\n"
       echo "Attempting SSH connection anyway (Press Ctrl+C to abort)..."
     fi
-    exec ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 mrhootyhoo@192.168.0.108 || {
+    exec ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 dingo@192.168.0.108 || {
       echo -e "\n\033[1;31mConnection closed.\033[0m Press Enter to return to local shell."
       read -r
       exec /bin/bash -i
@@ -81,7 +79,7 @@ case "$TARGET" in
     echo -e "\033[1;34m ☁️ Connecting to server01 (Cloud Anchor • Debian 12 / GCP us-central1)\033[0m"
     echo -e "\033[2m VPN Host: 192.168.219.1 | User: dingo | Circle of Trust\033[0m"
     echo -e "\033[1;36m========================================================================\033[0m\n"
-    exec sudo -u dingo ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 server01 || {
+    exec sudo -u dingo ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 dingo@192.168.219.1 || {
       echo -e "\n\033[1;31mConnection closed.\033[0m Press Enter to return to local shell."
       read -r
       exec /bin/bash -i
@@ -98,7 +96,7 @@ case "$TARGET" in
 
   *)
     echo -e "\033[1;31mUnknown target device: ${TARGET}\033[0m"
-    echo "Falling back to local shell..."
-    exec /bin/bash -i
+    echo "Falling back to local dingo shell..."
+    exec sudo -u dingo -i
     ;;
 esac
