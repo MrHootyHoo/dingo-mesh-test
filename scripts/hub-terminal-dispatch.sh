@@ -94,6 +94,18 @@ case "$TARGET" in
     exec /usr/local/bin/gw-cli interactive
     ;;
 
+  us-west4-a-gateway-node-20261026055828|us-west4-a-gw*|us-west4*|gateway*|*gateway-node*)
+    echo -e "\033[1;36m========================================================================\033[0m"
+    echo -e "\033[1;32m 🌐 Connecting to Dynamic Gateway Node (Las Vegas • us-west4-a)\033[0m"
+    echo -e "\033[2m Public IPv4: 34.50.171.148 | User: dingo | lan0 Gateway Node\033[0m"
+    echo -e "\033[1;36m========================================================================\033[0m\n"
+    exec ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 dingo@34.50.171.148 || {
+      echo -e "\n\033[1;31mConnection closed.\033[0m Press Enter to return to local shell."
+      read -r
+      exec /bin/bash -i
+    }
+    ;;
+
   *)
     echo -e "\033[1;31mUnknown target device: ${TARGET}\033[0m"
     echo "Falling back to local dingo shell..."

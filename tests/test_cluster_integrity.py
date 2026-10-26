@@ -61,10 +61,19 @@ class TestClusterIntegrity(unittest.TestCase):
                 self.fail(f"Invalid VPN IPv4 address '{vpn_ip}' for device '{dev_id}'")
 
             vpn_subnet = ipaddress.IPv4Network("192.168.219.0/24")
-            self.assertTrue(
-                vpn_obj in vpn_subnet,
-                f"Device '{dev_id}' VPN IP '{vpn_ip}' is outside the Circle of Trust mesh (192.168.219.0/24)"
-            )
+            # Dynamic regional gateway nodes allocate subnets such as 192.168.235.0/24
+            is_regional_gw = d.get("role", "").startswith("Dynamic Gateway Node") or "gateway-node" in dev_id
+            if is_regional_gw:
+                regional_supernet = ipaddress.IPv4Network("192.168.0.0/16")
+                self.assertTrue(
+                    vpn_obj in regional_supernet,
+                    f"Gateway device '{dev_id}' VPN IP '{vpn_ip}' is outside the valid private mesh scope (192.168.0.0/16)"
+                )
+            else:
+                self.assertTrue(
+                    vpn_obj in vpn_subnet,
+                    f"Device '{dev_id}' VPN IP '{vpn_ip}' is outside the Circle of Trust mesh (192.168.219.0/24)"
+                )
 
     def test_terminal_dispatch_alignment(self):
         """
@@ -79,8 +88,8 @@ class TestClusterIntegrity(unittest.TestCase):
             expected_ip = dev["ip"]
             expected_vpn_ip = dev["vpnIp"]
 
-            # 1. Device ID must be present in a case branch (handling pipe alternatives like omada-gw|router)
-            pattern = rf"(?:^|\n|\s)([a-zA-Z0-9_\-|]*\b{re.escape(dev_id)}\b[a-zA-Z0-9_\-|]*)\)"
+            # 1. Device ID must be present in a case branch (handling pipe alternatives and glob patterns)
+            pattern = rf"(?:^|\n|\s)([a-zA-Z0-9_\-|*]*\b{re.escape(dev_id)}\b[a-zA-Z0-9_\-|*]*)\)"
             match = re.search(pattern, self.dispatch_script)
             self.assertIsNotNone(
                 match,
