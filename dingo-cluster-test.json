@@ -1,0 +1,50 @@
+{
+  "project": "DINGO Autonomous Edge Cluster",
+  "repository": "MrHootyHoo/dingo-mesh-test",
+  "verification_timestamp": "2026-10-25T20:55:00-07:00",
+  "author": "Antigravity Swarm Core & Shea Barbacci",
+  "cluster_nodes": [
+    {
+      "node": "van01",
+      "role": "Primary Edge Gateway & Controller",
+      "ip": "192.168.0.106",
+      "vip": "192.168.0.200",
+      "status": "online"
+    },
+    {
+      "node": "van02",
+      "role": "Secondary Edge Node & Replica Host",
+      "ip": "192.168.0.105",
+      "status": "online"
+    },
+    {
+      "node": "brain01",
+      "role": "Neural Compute Core & Workstation",
+      "ip": "192.168.0.108",
+      "status": "online"
+    },
+    {
+      "node": "node01",
+      "role": "Fabrication Node (Klipper / Mainsail)",
+      "ip": "192.168.0.107",
+      "status": "online"
+    },
+    {
+      "node": "server01",
+      "role": "Cloud Anchor Node (GCP us-central1)",
+      "vpn_ip": "192.168.219.1",
+      "status": "online"
+    },
+    {
+      "node": "omada-gw",
+      "role": "Perimeter Gateway Router (ER706W)",
+      "ip": "192.168.0.1",
+      "status": "online"
+    }
+  ],
+  "jules_integration": {
+    "status": "ready_for_session",
+    "endpoint": "https://jules.google.com/session",
+    "purpose": "Autonomous continuous repository monitoring, PR reviews, and automated task execution under Google 10TB tier."
+  }
+}
