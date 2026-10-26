@@ -1,0 +1,13 @@
+[Unit]
+Description=DINGO Dynamic Gateway Node Auto-Registration
+After=pritunl.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStartPre=/usr/local/bin/wait-for-tun0.sh
+ExecStart=/usr/local/bin/dingo-gateway-announce.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
